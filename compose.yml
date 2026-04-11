@@ -31,3 +31,9 @@ services:
     
     sysctls:
       - net.ipv4.ip_local_port_range=1024 65000
+
+    healthcheck:
+      test: [ "CMD-SHELL", "nslookup google.com" ]  
+      interval: 1m
+      timeout: 10s
+      retries: 3
