@@ -6,10 +6,8 @@ services:
     networks:
       vlan10_net:
         ipv4_address: 192.168.1.253
-        gw_priority: 100
       vlan100_net:
         ipv4_address: 10.1.0.1
-        gw_priority: 90
     ports:
       - "192.168.1.253:5380:5380/tcp"  # Web console (HTTP)
       # - "53:53/udp"      # DNS service
