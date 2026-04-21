@@ -3,13 +3,19 @@ services:
     container_name: dns-server
     hostname: dns-server
     image: technitium/dns-server:14.3.0
-    
+    networks:
+      vlan10_net:
+        ipv4_address: 192.168.1.253
+        gw_priority: 100
+      vlan100_net:
+        ipv4_address: 10.1.0.1
+        gw_priority: 90
     ports:
-      - "5380:5380/tcp"  # Web console (HTTP)
-      - "53:53/udp"      # DNS service
-      - "53:53/tcp"      # DNS service
+      - "192.168.1.253:5380:5380/tcp"  # Web console (HTTP)
+      # - "53:53/udp"      # DNS service
+      # - "53:53/tcp"      # DNS service
       # Optional ports - uncomment as needed:
-      - "53443:53443/tcp"  # Web console (HTTPS)
+      - "192.168.1.253:53443:53443/tcp"  # Web console (HTTPS)
       # - "853:853/udp"      # DNS-over-QUIC
       # - "853:853/tcp"      # DNS-over-TLS
       # - "443:443/udp"      # DNS-over-HTTPS (HTTP/3)
@@ -23,7 +29,7 @@ services:
       # - DNS_SERVER_PREFER_IPV6=false
       # - DNS_SERVER_RECURSION=AllowOnlyForPrivateNetworks
       - DNS_SERVER_FORWARDERS=1.1.1.1,8.8.8.8
-    
+
     volumes:
       - ./vol:/etc/dns
     
@@ -37,3 +43,10 @@ services:
       interval: 1m
       timeout: 10s
       retries: 3
+
+networks:
+  vlan10_net:
+    external: true
+  vlan100_net:
+    external: true
+
