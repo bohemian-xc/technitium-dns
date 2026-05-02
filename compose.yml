@@ -1,7 +1,7 @@
 services:
   dns-server:
-    container_name: dns-server
-    hostname: dns-server
+    container_name: ${CONTAINER_NAME:-technitium-dns}
+    hostname: ${HOSTNAME:-dns-server}
     image: technitium/dns-server:14.3.0
     networks:
       app_net:
