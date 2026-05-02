@@ -4,18 +4,16 @@ services:
     hostname: dns-server
     image: technitium/dns-server:14.3.0
     networks:
-      vlan10_net:
-        ipv4_address: 192.168.1.31
-      # vlan100_net:
-      #   ipv4_address: 10.1.0.1
-      # vlan200_net:
-      #   ipv4_address: 10.2.0.1
-    # ports:
-      # - "192.168.1.31:5380:5380"  # Web console (HTTP)
+      app_net:
+        ipv4_address: ${APP_NET_IPADDR}
+      dhcp_net:
+        ipv4_address: ${DHCP_NET_IPADDR}
+    ports:
+      - "${APP_NET_IPADDR}:5380:5380"  # Web console (HTTP)
       # - "53:53/udp"      # DNS service
       # - "53:53/tcp"      # DNS service
       # Optional ports - uncomment as needed:
-      # - "192.168.1.31:53443:53443"  # Web console (HTTPS)
+      - "${APP_NET_IPADDR}:53443:53443"  # Web console (HTTPS)
       # - "853:853/udp"      # DNS-over-QUIC
       # - "853:853/tcp"      # DNS-over-TLS
       # - "443:443/udp"      # DNS-over-HTTPS (HTTP/3)
@@ -48,39 +46,10 @@ services:
       retries: 3
 
 networks:
-  # vlan10_net:
-  #   driver: ipvlan
-  #   driver_opts:
-  #     parent: wlan0
-  #     ipvlan_mode: l2
-  #   ipam:
-  #     config:
-  #       - subnet: 192.168.1.0/24
-  #         gateway: 192.168.1.254
-  vlan10_net:
-    driver: macvlan
-    driver_opts:
-      parent: eth0
-    ipam:
-      config:
-        - subnet: 192.168.1.0/24
-          gateway: 192.168.1.254
-  # vlan100_net:
-  #   driver: ipvlan
-  #   driver_opts:
-  #     parent: eth0.100
-  #     ipvlan_mode: l2
-  #   ipam:
-  #     config:
-  #       - subnet: 10.1.0.0/24
-  #         gateway: 10.1.0.254
-  # vlan200_net:
-  #   driver: ipvlan
-  #   driver_opts:
-  #     parent: eth0.200
-  #     ipvlan_mode: l2
-  #   ipam:
-  #     config:
-  #       - subnet: 10.2.0.0/24
-  #         gateway: 10.2.0.254
+  app_net:
+    name: ${APP_NET_NAME}
+    external: true
+  dhcp_net:
+    name: ${DHCP_NET_NAME}
+    external: true
 
