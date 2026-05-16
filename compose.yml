@@ -15,7 +15,7 @@ services:
       # Optional ports - uncomment as needed:
       - "${APP_NET_IPADDR}:53443:53443"  # Web console (HTTPS)
       # - "853:853/udp"      # DNS-over-QUIC
-      # - "853:853/tcp"      # DNS-over-TLS
+      # - "853:853/tcp"      # DNS-over-TLS 
       # - "443:443/udp"      # DNS-over-HTTPS (HTTP/3)
       # - "443:443/tcp"      # DNS-over-HTTPS (HTTP/1.1, HTTP/2)
       # - "67:67/udp"        # DHCP service
@@ -40,10 +40,12 @@ services:
       - NET_ADMIN
 
     healthcheck:
-      test: [ "CMD-SHELL", "nslookup google.com" ]  
-      interval: 1m
-      timeout: 10s
-      retries: 3
+      test:
+        - "CMD-SHELL"
+        - ${HEALTHCHECK_CMD:-nslookup google.com}
+      interval: ${HEALTHCHECK_INTERVAL:-30s}
+      timeout: ${HEALTHCHECK_TIMEOUT:-10s}
+      retries: ${HEALTHCHECK_RETRIES:-3}
 
 networks:
   app_net:
