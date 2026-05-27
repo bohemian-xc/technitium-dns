@@ -10,8 +10,8 @@ services:
         ipv4_address: ${DHCP1_NET_IPADDR}
       dhcp2_net:
         ipv4_address: ${DHCP2_NET_IPADDR}
-      dhcp3_net:
-        ipv4_address: ${DHCP3_NET_IPADDR}
+      # dhcp3_net:
+      #   ipv4_address: ${DHCP3_NET_IPADDR}
     ports:
       - "${APP_NET_IPADDR}:5380:5380"  # Web console (HTTP)
       # - "53:53/udp"      # DNS service
@@ -61,7 +61,7 @@ networks:
   dhcp2_net:
     name: ${DHCP2_NET_NAME}
     external: true
-  dhcp3_net:
-    name: ${DHCP3_NET_NAME}
-    external: true
+  # dhcp3_net:
+  #   name: ${DHCP3_NET_NAME}
+  #   external: true
 
