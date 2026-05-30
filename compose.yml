@@ -27,10 +27,10 @@ services:
     environment:
       - DNS_SERVER_DOMAIN=dns-server
       # Uncomment and set for production:
-      - DNS_SERVER_ADMIN_PASSWORD=${DNS_SERVER_ADMIN_PASSWORD}
-      - DNS_SERVER_PREFER_IPV6=${DNS_SERVER_PREFER_IPV6:-false}
-      - DNS_SERVER_RECURSION=${DNS_SERVER_RECURSION:-AllowOnlyForPrivateNetworks}
-      - DNS_SERVER_FORWARDERS=${DNS_SERVER_FORWARDERS:-1.1.1.1.1,8.8.8.8}
+      # - DNS_SERVER_ADMIN_PASSWORD=${DNS_SERVER_ADMIN_PASSWORD}
+      # - DNS_SERVER_PREFER_IPV6=${DNS_SERVER_PREFER_IPV6:-false}
+      # - DNS_SERVER_RECURSION=${DNS_SERVER_RECURSION:-AllowOnlyForPrivateNetworks}
+      # - DNS_SERVER_FORWARDERS=${DNS_SERVER_FORWARDERS:-1.1.1.1.1,8.8.8.8}
 
     volumes:
       - ./vol:/etc/dns
