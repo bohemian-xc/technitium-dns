@@ -88,8 +88,6 @@ services:
       - NET_RAW
       - NET_BROADCAST
       - SYS_MODULE
-    sysctl:
-      - net.ipv4.ip_nonlocal_bind=1
     volumes:
       - ${KA_VOL_CFG:-./vol/keepalived/keepalived.conf}:/usr/local/etc/keepalived/keepalived.conf:ro
       - ${KA_VOL_LOG:-./vol/keepalived/log/}:/var/log/keepalived/:rw
