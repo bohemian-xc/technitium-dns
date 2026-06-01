@@ -1,0 +1,110 @@
+services:
+  dns-server:
+    image: ${IMAGE_NAME:-technitium/dns:latest}
+    container_name: ${CONTAINER_NAME:-technitium-dns}
+    hostname: ${HOSTNAME:-dns-server}
+    networks:
+      app_net:
+        ipv4_address: ${APP_NET_IPADDR}
+        interface_name: ${APP_NET_ETH}
+      dhcp1_net:
+        ipv4_address: ${DHCP1_NET_IPADDR}
+        interface_name: ${DHCP1_NET_ETH}
+      dhcp2_net:
+        ipv4_address: ${DHCP2_NET_IPADDR}
+        interface_name: ${DHCP2_NET_ETH}
+      # dhcp3_net:
+      #   ipv4_address: ${DHCP3_NET_IPADDR}
+      #   interface_name: ${DHCP3_NET_ETH}
+    ports:
+      - "${APP_NET_IPADDR}:5380:5380"  # Web console (HTTP)
+      - "53:53/udp"      # DNS service
+      - "53:53/tcp"      # DNS service
+      # Optional ports - uncomment as needed:
+      - "${APP_NET_IPADDR}:53443:53443"  # Web console (HTTPS)
+      - "67:67/udp"        # DHCP service
+      # - "853:853/udp"      # DNS-over-QUIC
+      # - "853:853/tcp"      # DNS-over-TLS 
+      # - "443:443/udp"      # DNS-over-HTTPS (HTTP/3)
+      # - "443:443/tcp"      # DNS-over-HTTPS (HTTP/1.1, HTTP/2)
+    
+    environment:
+      - DNS_SERVER_DOMAIN=${DNS_SERVER_DOMAIN}
+      # Uncomment and set for production:
+      - DNS_SERVER_ADMIN_PASSWORD=${DNS_SERVER_ADMIN_PASSWORD}
+      - DNS_SERVER_PREFER_IPV6=${DNS_SERVER_PREFER_IPV6:-false}
+      - DNS_SERVER_RECURSION=${DNS_SERVER_RECURSION:-AllowOnlyForPrivateNetworks}
+      - DNS_SERVER_FORWARDERS=${DNS_SERVER_FORWARDERS:-1.1.1.1.1,8.8.8.8}
+
+    volumes:
+      - ./vol:/etc/dns
+    
+    restart: unless-stopped
+    
+    sysctls:
+      - net.ipv4.ip_local_port_range=1024 65000
+
+    cap_add:
+      - NET_ADMIN
+
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - ${HEALTHCHECK_CMD:-nslookup google.com}
+      interval: ${HEALTHCHECK_INTERVAL:-30s}
+      timeout: ${HEALTHCHECK_TIMEOUT:-10s}
+      retries: ${HEALTHCHECK_RETRIES:-3}
+
+  dns-keepalived:
+    build:
+      context: .
+      dockerfile: Dockerfile.armv7
+    image: ${KA_IMAGE}
+    container_name: ${KA_CONTAINER_NAME:-dns-keepalived}
+    # hostname: ${KA_HOST_NAME:-keepalived}
+    restart: always
+    depends_on:
+      dns-server:
+        condition: service_healthy
+    environment:
+      KEEPALIVED_OPTS: "${KA_OPTS:--n -l -D -f /usr/local/etc/keepalived/keepalived.conf}"
+      KEEPALIVED_LOG_FILE: "${KA_LOG_FILE:-/var/log/keepalived/keepalived.log}"
+      LOGROTATE_INTERVAL: "${KA_LOGROTATE_INTERVAL:-86400}"
+      LOGROTATE_ROTATE: "${KA_LOGROTATE_ROTATE:-7}"
+      LOGROTATE_COMPRESS: "${KA_LOGROTATE_COMPRESS:-true}"
+    # Define the healthcheck to perform.
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - ${KA_HEALTHCHECK_CMD:-nslookup google.com}
+      interval: ${KA_HEALTHCHECK_INT:-30s}
+      timeout: ${KA_HEALTHCHECK_TOT:-10s}
+      retries: ${KA_HEALTHCHECK_RTS:-3}
+      start_period: ${KA_HEALTHCHECK_STP:-30s}
+    # Joins the network namespace
+    network_mode: "service:dns-server"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+      - NET_BROADCAST
+      - SYS_MODULE
+    sysctl:
+      - net.ipv4.ip_nonlocal_bind=1
+    volumes:
+      - ${KA_VOL_CFG:-./vol/keepalived/keepalived.conf}:/usr/local/etc/keepalived/keepalived.conf:ro
+      - ${KA_VOL_LOG:-./vol/keepalived/log/}:/var/log/keepalived/:rw
+
+networks:
+  app_net:
+    name: ${APP_NET_NAME}
+    external: true
+  dhcp1_net:
+    name: ${DHCP1_NET_NAME}
+    external: true
+  dhcp2_net:
+    name: ${DHCP2_NET_NAME}
+    external: true
+  # dhcp3_net:
+  #   name: ${DHCP3_NET_NAME}
+  #   external: true
+
