@@ -1,8 +1,8 @@
 services:
   dns-server:
+    image: ${IMAGE_NAME:-technitium/dns:latest}
     container_name: ${CONTAINER_NAME:-technitium-dns}
     hostname: ${HOSTNAME:-dns-server}
-    image: technitium/dns-server:14.3.0
     networks:
       app_net:
         ipv4_address: ${APP_NET_IPADDR}
