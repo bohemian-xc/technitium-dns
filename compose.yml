@@ -33,7 +33,7 @@ services:
       - DNS_SERVER_FORWARDERS=${DNS_SERVER_FORWARDERS:-1.1.1.1.1,8.8.8.8}
 
     volumes:
-      - ./vol:/etc/dns
+      - ${VOLUME_NAME:-./vol/technitium}:/etc/dns
     
     restart: unless-stopped
     
